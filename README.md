@@ -1,10 +1,10 @@
 # Dekamond - Next.js Application
 
-A modern, scalable, and maintainable Next.js application built with enterprise architecture and senior-level development practices.
+A modern, scalable, and maintainable Next.js application built with enterprise architecture.
 
 ## 🏗️ Architecture Overview
 
-This project follows a **Domain-Driven Design (DDD)** approach with a **Feature-First** structure, ensuring scalability, maintainability, and developer experience. The architecture demonstrates senior-level frontend development practices with performance optimizations, error handling, and type safety.
+This project follows a **Domain-Driven Design (DDD)** approach with a **Feature-First** structure, ensuring scalability, maintainability, and developer experience.
 
 ```
 src/
@@ -326,4 +326,4 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ---
 
-**Built with ❤️ using modern web technologies and senior-level development practices**
+**Built with ❤️**
