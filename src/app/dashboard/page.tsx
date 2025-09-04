@@ -1,6 +1,5 @@
 "use client";
 
-import { ProtectedRoute } from "@/components/auth/ProtectedRoute";
 import { UserProfileCard, WelcomeCard } from "@/components/features/dashboard";
 
 export default function DashboardPage() {

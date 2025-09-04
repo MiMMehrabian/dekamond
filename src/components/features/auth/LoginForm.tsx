@@ -239,38 +239,6 @@ export function MobileVerificationForm({
                 </div>
               )}
 
-              {/* Success message with ARIA live region */}
-              {randomUserData && (
-                <div
-                  className="slide-up p-4 bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-200 rounded-lg"
-                  role="status"
-                  aria-live="polite"
-                  aria-label="User data retrieved successfully"
-                >
-                  <div className="flex items-center space-x-3">
-                    <div
-                      className="w-2 h-2 bg-green-500 rounded-full animate-pulse"
-                      aria-hidden="true"
-                    ></div>
-                    <div className="flex-1">
-                      <p className="text-sm text-blue-700 font-medium">
-                        User Data Retrieved
-                      </p>
-                      <p className="text-xs text-blue-600 mt-1">
-                        {randomUserData.results[0].name.first}{" "}
-                        {randomUserData.results[0].name.last}
-                      </p>
-                      <p className="text-xs text-blue-600">
-                        {randomUserData.results[0].email}
-                      </p>
-                    </div>
-                  </div>
-                  <p className="text-xs text-green-600 mt-2 font-medium">
-                    ✓ Stored in localStorage • Redirecting to dashboard...
-                  </p>
-                </div>
-              )}
-
               <Button
                 type="submit"
                 className="w-full h-12 text-base font-medium btn-primary shadow-soft hover:shadow-medium transition-all duration-200 ease-out"
