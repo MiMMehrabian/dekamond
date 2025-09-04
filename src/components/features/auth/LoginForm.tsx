@@ -11,16 +11,17 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
+import { useToast } from "@/components/ui/use-toast";
+import { MobileFormData, mobileSchema } from "@/lib/constants/validation";
+import { useUser } from "@/lib/contexts/UserContext";
 import { useMobileVerification } from "@/lib/hooks/useMobileVerification";
 import { useRandomUser } from "@/lib/hooks/useRandomUser";
-import { useUser } from "@/lib/contexts/UserContext";
-import { useToast } from "@/components/ui/use-toast";
-import { mobileSchema, MobileFormData } from "@/lib/constants/validation";
 import { cn } from "@/lib/utils";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useForm } from "react-hook-form";
-import { useEffect, useState, useCallback, useMemo } from "react";
 import { useQueryClient } from "@tanstack/react-query";
+import { useCallback, useEffect, useMemo, useState } from "react";
+import { useForm } from "react-hook-form";
+import { useRouter } from "next/navigation";
 
 interface MobileVerificationFormProps {
   className?: string;
@@ -41,6 +42,7 @@ export function MobileVerificationForm({
   const { setUser } = useUser();
   const { toast } = useToast();
   const queryClient = useQueryClient();
+  const router = useRouter();
 
   // Memoized form configuration for performance
   const formConfig = useMemo(
@@ -54,7 +56,7 @@ export function MobileVerificationForm({
     []
   );
 
-  const { isSubmitting, isSuccess } = useMobileVerification({
+  const { isSubmitting, error, isSuccess } = useMobileVerification({
     onSuccess,
     onError,
     onVerificationSent: useCallback(
@@ -69,16 +71,22 @@ export function MobileVerificationForm({
     ),
   });
 
-  const { data: randomUserData, isLoading: isUserLoading } =
-    useRandomUser(shouldFetchUser);
+  const {
+    data: randomUserData,
+    isLoading: isUserLoading,
+    error: userError,
+    refetch: refetchUser,
+  } = useRandomUser(shouldFetchUser);
 
   // Memoized error message for performance
   const errorMessage = useMemo(() => {
-    if (randomUserData && !isUserLoading) {
-      return null;
+    if (userError) {
+      return userError instanceof Error
+        ? userError.message
+        : "Failed to fetch user data";
     }
     return null;
-  }, [randomUserData, isUserLoading]);
+  }, [userError]);
 
   useEffect(() => {
     if (errorMessage) {
@@ -89,6 +97,16 @@ export function MobileVerificationForm({
       });
     }
   }, [errorMessage, toast]);
+
+  useEffect(() => {
+    if (error) {
+      toast({
+        variant: "destructive",
+        title: "Verification Error",
+        description: error,
+      });
+    }
+  }, [error, toast]);
 
   const form = useForm<MobileFormData>(formConfig);
 
@@ -108,12 +126,8 @@ export function MobileVerificationForm({
     async (data: MobileFormData) => {
       queryClient.removeQueries({ queryKey: ["randomUser"] });
       setShouldFetchUser(true);
-
-      setTimeout(() => {
-        onSuccess?.(data);
-      }, 1000);
     },
-    [queryClient, onSuccess]
+    [queryClient]
   );
 
   const storeUserData = useCallback(() => {
@@ -139,6 +153,13 @@ export function MobileVerificationForm({
   useEffect(() => {
     storeUserData();
   }, [storeUserData]);
+
+  // Call onSuccess when user is successfully set
+  useEffect(() => {
+    if (randomUserData && !isUserLoading && !userError) {
+      onSuccess?.({ mobile: "" }); // Pass empty mobile since we don't need it for navigation
+    }
+  }, [randomUserData, isUserLoading, userError, onSuccess]);
 
   // Memoized disabled state for performance
   const isDisabled = useMemo(
@@ -205,6 +226,19 @@ export function MobileVerificationForm({
                 )}
               />
 
+              {/* Error message with ARIA live region */}
+              {error && (
+                <div
+                  className="fade-in p-4 bg-destructive/10 border border-destructive/20 rounded-lg"
+                  role="alert"
+                  aria-live="polite"
+                >
+                  <p className="text-sm text-destructive font-medium">
+                    {error}
+                  </p>
+                </div>
+              )}
+
               {/* Success message with ARIA live region */}
               {randomUserData && (
                 <div
@@ -232,7 +266,7 @@ export function MobileVerificationForm({
                     </div>
                   </div>
                   <p className="text-xs text-green-600 mt-2 font-medium">
-                    ✓ Stored in localStorage
+                    ✓ Stored in localStorage • Redirecting to dashboard...
                   </p>
                 </div>
               )}

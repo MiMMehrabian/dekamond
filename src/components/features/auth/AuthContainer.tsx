@@ -2,6 +2,9 @@
 
 import { MobileVerificationForm } from "./LoginForm";
 import { MobileFormData } from "@/lib/constants/validation";
+import { useRouter } from "next/navigation";
+import { useUser } from "@/lib/contexts/UserContext";
+import { useEffect } from "react";
 
 interface AuthContainerProps {
   className?: string;
@@ -17,9 +20,19 @@ export function AuthContainer({
   onSignUp,
   onVerificationSent,
 }: AuthContainerProps) {
+  const router = useRouter();
+  const { isAuthenticated } = useUser();
+
+  useEffect(() => {
+    if (isAuthenticated) {
+      router.push("/dashboard");
+    }
+  }, [isAuthenticated, router]);
+
   const handleSuccess = (data: MobileFormData) => {
-    // Handle successful authentication
-    console.log("Authentication successful:", data);
+    setTimeout(() => {
+      router.push("/dashboard");
+    }, 1000);
   };
 
   return (

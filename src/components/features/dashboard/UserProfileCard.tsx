@@ -8,7 +8,7 @@ export function UserProfileCard() {
   const { user } = useUser();
 
   return (
-    <Card>
+    <Card className="my-2">
       <CardHeader>
         <CardTitle>Profile</CardTitle>
       </CardHeader>
